@@ -1,8 +1,8 @@
-# calculs\visserie.py
+# calculs/visserie.py
 
 import math
 
-# Table ISO Métrique standard (résumé, tu peux enrichir ou charger CSV/JSON plus tard)
+# Table ISO Métrique standard (à compléter selon tes besoins)
 VIS_ISO = [
     {"designation": "M4",  "pas": 0.7,  "d_nom": 4.0,  "d_perc": 4.5,  "d_taraud": 3.3,  "section": 8.78,  "classe": "8.8", "Rm": 800,  "Re": 640},
     {"designation": "M5",  "pas": 0.8,  "d_nom": 5.0,  "d_perc": 5.5,  "d_taraud": 4.2,  "section": 14.2,  "classe": "8.8", "Rm": 800,  "Re": 640},
@@ -11,7 +11,7 @@ VIS_ISO = [
     {"designation": "M10", "pas": 1.5,  "d_nom": 10.0, "d_perc": 11.0, "d_taraud": 8.5,  "section": 58.0,  "classe": "8.8", "Rm": 800,  "Re": 640},
     {"designation": "M12", "pas": 1.75, "d_nom": 12.0, "d_perc": 13.5, "d_taraud": 10.2, "section": 84.3,  "classe": "8.8", "Rm": 800,  "Re": 640},
     {"designation": "M16", "pas": 2.0,  "d_nom": 16.0, "d_perc": 17.5, "d_taraud": 14.0, "section": 157.0, "classe": "8.8", "Rm": 800,  "Re": 640},
-    # ... complète selon tes besoins ou charge externe !
+    # ... complète selon tes besoins
 ]
 
 def get_vis(designation):
@@ -21,32 +21,28 @@ def get_vis(designation):
             return vis
     raise ValueError(f"Vis non trouvée: {designation}")
 
-def resistance_vis(F, type_effort="traction", classe="8.8", Securite=2, nb_vis=1):
+def resistance_vis(F, type_effort, classe, Securite, nb_vis):
     """
-    Calcule la **taille minimale de vis ISO** nécessaire pour un effort donné, le type d'effort, le matériau,
-    et la sécurité (classe de vis, coef de sécurité Securite).
-    
-    - F: force appliquée (N)
-    - type_effort: "traction", "cisaillement", "mixte"
-    - classe: classe résistance vis (8.8, 10.9...)
-    - Securite: coefficient de sécurité (généralement 1.5 à 2)
-    - nb_vis: nombre de vis partageant la charge
-
-    Retourne un dictionnaire avec toutes les infos vis recommandées.
+    Calcule la vis nécessaire pour un effort F (N), type_effort, classe, sécurité et nombre.
+    Aucune valeur par défaut : tout est obligatoire.
     """
-    # Sélection de la résistance matière selon la classe
+    # Sélection des propriétés matière
     table_Rm = {"8.8": 800, "10.9": 1040, "12.9": 1220}
     table_Re = {"8.8": 640, "10.9": 940, "12.9": 1100}
-    Rm = table_Rm.get(str(classe), 800)
-    Re = table_Re.get(str(classe), 640)
+    if str(classe) not in table_Re:
+        raise ValueError("Classe de vis inconnue (8.8, 10.9, 12.9)")
+    Rm = table_Rm[str(classe)]
+    Re = table_Re[str(classe)]
 
-    # Calcul de la contrainte admissible selon l’effort
+    # Contrainte admissible selon l’effort
     if type_effort == "traction":
         sigma_adm = Re / Securite
     elif type_effort == "cisaillement":
-        sigma_adm = (0.6 * Re) / Securite  # Cf. règles usuelles
-    else:  # Mixte (simpliste : coef 0.8)
+        sigma_adm = (0.6 * Re) / Securite
+    elif type_effort == "mixte":
         sigma_adm = (0.8 * Re) / Securite
+    else:
+        raise ValueError("type_effort doit être 'traction', 'cisaillement' ou 'mixte'")
 
     # Section requise
     S_requise = abs(F) / (sigma_adm * nb_vis)  # m²
@@ -83,7 +79,7 @@ def perçage_taraudage_recommande(diam_vis_iso):
     vis = get_vis(diam_vis_iso)
     return {"d_percage": vis["d_perc"], "d_taraudage": vis["d_taraud"]}
 
-def check_assemblage(F, type_effort, classe, nb_vis, Securite=2):
+def check_assemblage(F, type_effort, classe, nb_vis, Securite):
     """
     Vérifie la validité d'un assemblage selon la charge F, nombre de vis, classe, etc.
     """
@@ -92,10 +88,17 @@ def check_assemblage(F, type_effort, classe, nb_vis, Securite=2):
     marge = (info["Fmax_vis"] * nb_vis - abs(F)) / abs(F) if F else 99
     return {"OK": ok, "marge_sécurité": round(marge, 2), "info": info}
 
+def calc_visserie(F, type_effort, classe, Securite, nb_vis):
+    """
+    Fonction d'interface principale à importer.
+    Obligatoire : tous les paramètres doivent être donnés explicitement.
+    """
+    return resistance_vis(F, type_effort, classe, Securite, nb_vis)
+
 # EXEMPLE D’UTILISATION :
 if __name__ == "__main__":
-    # Cas d’un couvercle soumis à 20 kN en traction, sécurité 2, 6 vis
-    res = resistance_vis(20000, "traction", classe="8.8", Securite=2, nb_vis=6)
+    # Exemple : 20000N en traction, sécurité 2, 6 vis classe 8.8
+    res = calc_visserie(F=20000, type_effort="traction", classe="8.8", Securite=2, nb_vis=6)
     print("Dimensionnement vis :", res)
     print("Perçage/taraudage recommandé :", perçage_taraudage_recommande(res["designation"]))
-    print("Vérif assemblage (attendu OK) :", check_assemblage(20000, "traction", "8.8", 6, 2))
+    print("Vérif assemblage :", check_assemblage(F=20000, type_effort="traction", classe="8.8", nb_vis=6, Securite=2))

@@ -10,15 +10,19 @@ class AxePistonStirling:
 
     def __init__(
         self,
-        diametre_m,                  # Diamètre de l’axe (m)
-        longueur_m,                  # Longueur totale (m)
-        matiere="Acier trempé",
-        densite_kg_m3=7850,
-        rugosite_um=0.8,
-        etat_surface="Rectifié"
+        diametre_m,        # Diamètre de l’axe (m)
+        longueur_m,        # Longueur totale (m)
+        matiere,           # Aucune valeur par défaut : à renseigner !
+        densite_kg_m3,
+        rugosite_um,
+        etat_surface
     ):
-        if diametre_m <= 0 or longueur_m <= 0:
-            raise ValueError("Diamètre ou longueur d’axe non valides")
+        # Contrôle d’exhaustivité
+        params = [diametre_m, longueur_m, matiere, densite_kg_m3, rugosite_um, etat_surface]
+        if any(x is None for x in params):
+            raise ValueError("Tous les paramètres sont obligatoires et doivent être explicitement renseignés.")
+        if diametre_m <= 0 or longueur_m <= 0 or densite_kg_m3 <= 0 or rugosite_um < 0:
+            raise ValueError("Paramètres dimensionnels ou de densité invalides.")
         self.diametre = diametre_m
         self.longueur = longueur_m
         self.matiere = matiere
@@ -82,11 +86,11 @@ class AxePistonStirling:
             f"{self.matiere}, Ra={self.rugosite} µm, {self.etat_surface})"
         )
 
-# Exemple d’utilisation :
+# Exemple d’utilisation (aucune valeur par défaut, tout doit être passé explicitement)
 if __name__ == "__main__":
     axe = AxePistonStirling(
-        diametre_m=0.008,     # 8 mm
-        longueur_m=0.025,     # 25 mm
+        diametre_m=0.008,         # 8 mm
+        longueur_m=0.025,         # 25 mm
         matiere="Acier trempé 100Cr6",
         densite_kg_m3=7810,
         rugosite_um=0.6,
