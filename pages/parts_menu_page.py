@@ -2,6 +2,14 @@
 import tkinter as tk
 from colors import *
 
+# Import des pages de pièces — à adapter selon tes modules (garde les imports même si certains fichiers sont vides pour l’instant)
+from pieces.piece_cylindre import PieceCylindrePage
+from pieces.piece_piston import PiecePistonPage
+from pieces.piece_bielle import PieceBiellePage
+from pieces.piece_visserie import PieceVisseriePage
+from pieces.piece_joints import PieceJointsPage
+from pieces.piece_roulement import PieceRoulementPage
+
 class PartsMenuPage(tk.Frame):
     def __init__(self, master, tech_sheet):
         super().__init__(master, bg=BG)
@@ -10,7 +18,7 @@ class PartsMenuPage(tk.Frame):
 
         tk.Label(self, text="Menu des pièces", font=("Segoe UI", 20, "bold"), bg=BG, fg=BF).pack(pady=25)
 
-        # Exemple de boutons pour accéder à chaque pièce
+        # Boutons d'accès à chaque pièce
         buttons = [
             ("Cylindre", self.goto_cylindre),
             ("Piston", self.goto_piston),
@@ -30,22 +38,24 @@ class PartsMenuPage(tk.Frame):
         ).pack(pady=22)
 
     def goto_cylindre(self):
-        print("Accès au cylindre (future page à créer)")
+        self.master.show_page(PieceCylindrePage, self.tech_sheet)
 
     def goto_piston(self):
-        print("Accès au piston (future page à créer)")
+        self.master.show_page(PiecePistonPage, self.tech_sheet)
 
     def goto_bielle(self):
-        print("Accès à la bielle (future page à créer)")
+        self.master.show_page(PieceBiellePage, self.tech_sheet)
 
     def goto_visserie(self):
-        print("Accès à la visserie (future page à créer)")
+        self.master.show_page(PieceVisseriePage, self.tech_sheet)
 
     def goto_joints(self):
-        print("Accès aux joints toriques (future page à créer)")
+        self.master.show_page(PieceJointsPage, self.tech_sheet)
 
     def goto_roulement(self):
-        print("Accès au roulement (future page à créer)")
+        self.master.show_page(PieceRoulementPage, self.tech_sheet)
 
     def goto_back(self):
-        self.master.show_page(type(self.master.current_frame), self.tech_sheet)
+        # Retour à la page projet
+        from pages.create_project_page import CreateProjectPage
+        self.master.show_page(CreateProjectPage)
