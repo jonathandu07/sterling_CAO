@@ -3,6 +3,8 @@
 import math
 import traceback
 from calculs.villebrequin import VillebrequinStirling
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def pretty_assert(desc, cond, attendu, obtenu):
     if cond:

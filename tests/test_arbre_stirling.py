@@ -1,7 +1,8 @@
 # tests\test_arbre_stirling.py
 
 import traceback
-
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from calculs.arbre import ArbreStirling
 
 def test_arbre_stirling():

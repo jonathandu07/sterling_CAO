@@ -4,6 +4,8 @@
 import math
 import traceback
 from calculs.support_roulement import SupportRoulement, choix_roulement, ROULEMENTS_ISO, MATERIAUX_SUPP
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def pretty_assert(desc, cond, attendu, obtenu):
     if cond:

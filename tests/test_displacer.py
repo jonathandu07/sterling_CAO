@@ -2,6 +2,8 @@
 
 import traceback
 from calculs.displacer import DisplacerStirling
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def test_displacer_stirling():
     print("==== TEST : DisplacerStirling ====")

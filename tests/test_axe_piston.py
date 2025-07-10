@@ -2,6 +2,8 @@
 
 import traceback
 from calculs.axe_piston import AxePistonStirling
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def test_axe_piston_stirling():
     print("==== TEST : AxePistonStirling ====")

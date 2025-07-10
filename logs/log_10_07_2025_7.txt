@@ -1,0 +1,326 @@
+==== Rapport de tests du 10/07/2025 18:59:07 ====
+Tests exécutés (11) :
+test_arbre_stirling.py
+test_axe_piston.py
+test_bielle.py
+test_couvercle_cylindre.py
+test_cylindre.py
+test_displacer.py
+test_joints.py
+test_stirling.py
+test_support_roulement.py
+test_villebrequin.py
+test_visserie.py
+
+
+
+########## 1/11 : test_arbre_stirling.py ##########
+
+Commande lancée : C:\Users\alpha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe D:\Documents\GitHub\sterling_CAO\tests\test_arbre_stirling.py
+
+=== STDOUT ===
+==== TEST : ArbreStirling ====
+
+--- Test #1: Cas nominal (Acier C45, D=12mm, L=80mm) ---
+ArbreStirling(D=12.00 mm, L=80.00 mm, Acier C45, Ra=1.6 µm, Rectifié fin)
+  Diamètre (mm)                 : 12.0
+  Longueur (mm)                 : 80.0
+  Matière                       : Acier C45
+  Densité (kg/m3)               : 7850
+  Rugosité (Ra, µm)             : 1.6
+  État de surface               : Rectifié fin
+  Masse (kg)                    : 0.07103
+  Volume (cm3)                  : 9.048
+  Surface latérale (cm2)        : 30.159
+  Section droite (mm2)          : 113.097
+  Moment quadratique I (mm4)    : 1017.88
+  Module de résistance W (mm3)  : 169.65
+
+--- Test #2: Erreur : diamètre nul ---
+Exception : Diamètre ou longueur d’arbre non valides (>0)
+Traceback :
+ Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_arbre_stirling.py", line 67, in test_arbre_stirling
+    arbre = ArbreStirling(**t["params"])
+  File "D:\Documents\GitHub\sterling_CAO\calculs\arbre.py", line 21, in __init__
+    raise ValueError("Diamètre ou longueur d’arbre non valides (>0)")
+ValueError: Diamètre ou longueur d’arbre non valides (>0)
+
+
+--- Test #3: Erreur : longueur négative ---
+Exception : Diamètre ou longueur d’arbre non valides (>0)
+Traceback :
+ Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_arbre_stirling.py", line 67, in test_arbre_stirling
+    arbre = ArbreStirling(**t["params"])
+  File "D:\Documents\GitHub\sterling_CAO\calculs\arbre.py", line 21, in __init__
+    raise ValueError("Diamètre ou longueur d’arbre non valides (>0)")
+ValueError: Diamètre ou longueur d’arbre non valides (>0)
+
+
+--- Test #4: Erreur : diamètre négatif ---
+Exception : Diamètre ou longueur d’arbre non valides (>0)
+Traceback :
+ Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_arbre_stirling.py", line 67, in test_arbre_stirling
+    arbre = ArbreStirling(**t["params"])
+  File "D:\Documents\GitHub\sterling_CAO\calculs\arbre.py", line 21, in __init__
+    raise ValueError("Diamètre ou longueur d’arbre non valides (>0)")
+ValueError: Diamètre ou longueur d’arbre non valides (>0)
+
+
+--- Test #5: Gros arbre (acier, D=35mm, L=450mm) ---
+ArbreStirling(D=35.00 mm, L=450.00 mm, Acier C45, Ra=1.6 µm, Rectifié fin)
+  Diamètre (mm)                 : 35.0
+  Longueur (mm)                 : 450.0
+  Matière                       : Acier C45
+  Densité (kg/m3)               : 7850
+  Rugosité (Ra, µm)             : 1.6
+  État de surface               : Rectifié fin
+  Masse (kg)                    : 3.39866
+  Volume (cm3)                  : 432.951
+  Surface latérale (cm2)        : 494.801
+  Section droite (mm2)          : 962.113
+  Moment quadratique I (mm4)    : 73661.76
+  Module de résistance W (mm3)  : 4209.24
+
+==== FIN TESTS ArbreStirling ====
+
+
+=== STDERR ===
+
+[OK] Script terminé sans erreur.
+
+==================================================
+
+
+########## 2/11 : test_axe_piston.py ##########
+
+Commande lancée : C:\Users\alpha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe D:\Documents\GitHub\sterling_CAO\tests\test_axe_piston.py
+
+=== STDOUT ===
+
+=== STDERR ===
+Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_axe_piston.py", line 4, in <module>
+    from calculs.axe_piston import AxePistonStirling
+ModuleNotFoundError: No module named 'calculs'
+
+[ERREUR] Code retour : 1
+
+==================================================
+
+
+########## 3/11 : test_bielle.py ##########
+
+Commande lancée : C:\Users\alpha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe D:\Documents\GitHub\sterling_CAO\tests\test_bielle.py
+
+=== STDOUT ===
+==== TEST : BielleStirling ====
+
+--- Test #1: Cas nominal (aciers usinés, valeurs réalistes) ---
+BielleStirling(L=48.00 mm, section=12.00x4.00 mm, Tête=18.00 mm, Pied=10.00 mm, Acier 42CrMo4, Ra=0.8 µm, Usinage + rectif)
+  Longueur (mm)                      : 48.0
+  Largeur (mm)                       : 12.0
+  Épaisseur (mm)                     : 4.0
+  Diamètre tête (mm)                 : 18.0
+  Diamètre pied (mm)                 : 10.0
+  Axe tête (mm)                      : 8.0
+  Axe pied (mm)                      : 8.0
+  Matière                            : Acier 42CrMo4
+  Densité (kg/m3)                    : 7850
+  État de surface                    : Usinage + rectif
+  Rugosité (Ra, µm)                  : 0.8
+  Masse (kg)                         : 0.02854
+  Volume total (cm3)                 : 3.636
+  Surface totale (cm2)               : 18.879
+  Moment quadratique (mm4)           : 64.0
+
+--- Test #2: Erreur : largeur négative ---
+Exception : Dimensions invalides
+Traceback :
+ Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_bielle.py", line 89, in test_bielle_stirling
+    b = BielleStirling(**t["params"])
+  File "D:\Documents\GitHub\sterling_CAO\calculs\bielle.py", line 28, in __init__
+    raise ValueError("Dimensions invalides")
+ValueError: Dimensions invalides
+
+
+--- Test #3: Erreur : longueur nulle ---
+Exception : Dimensions invalides
+Traceback :
+ Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_bielle.py", line 89, in test_bielle_stirling
+    b = BielleStirling(**t["params"])
+  File "D:\Documents\GitHub\sterling_CAO\calculs\bielle.py", line 28, in __init__
+    raise ValueError("Dimensions invalides")
+ValueError: Dimensions invalides
+
+
+--- Test #4: Bielle massive en alu (section carrée 20mm, L=60mm) ---
+BielleStirling(L=60.00 mm, section=20.00x20.00 mm, Tête=28.00 mm, Pied=18.00 mm, Aluminium 7075-T6, Ra=1.2 µm, Microbillage)
+  Longueur (mm)                      : 60.0
+  Largeur (mm)                       : 20.0
+  Épaisseur (mm)                     : 20.0
+  Diamètre tête (mm)                 : 28.0
+  Diamètre pied (mm)                 : 18.0
+  Axe tête (mm)                      : 12.0
+  Axe pied (mm)                      : 10.0
+  Matière                            : Aluminium 7075-T6
+  Densité (kg/m3)                    : 2800
+  État de surface                    : Microbillage
+  Rugosité (Ra, µm)                  : 1.2
+  Masse (kg)                         : 0.11593
+  Volume total (cm3)                 : 41.404
+  Surface totale (cm2)               : 76.903
+  Moment quadratique (mm4)           : 13333.33
+
+==== FIN TESTS BielleStirling ====
+
+
+=== STDERR ===
+
+[OK] Script terminé sans erreur.
+
+==================================================
+
+
+########## 4/11 : test_couvercle_cylindre.py ##########
+
+Commande lancée : C:\Users\alpha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe D:\Documents\GitHub\sterling_CAO\tests\test_couvercle_cylindre.py
+
+=== STDOUT ===
+
+=== STDERR ===
+Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_couvercle_cylindre.py", line 4, in <module>
+    from calculs.couvercle_cylindre import CouvercleCylindreStirling
+ModuleNotFoundError: No module named 'calculs'
+
+[ERREUR] Code retour : 1
+
+==================================================
+
+
+########## 5/11 : test_cylindre.py ##########
+
+Commande lancée : C:\Users\alpha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe D:\Documents\GitHub\sterling_CAO\tests\test_cylindre.py
+
+=== STDOUT ===
+
+=== STDERR ===
+D:\Documents\GitHub\sterling_CAO\tests\test_cylindre.py:157: SyntaxWarning: "is not" with 'str' literal. Did you mean "!="?
+  if test["expect_fail"] and test["expect_fail"] is not "zone_chaude":
+Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_cylindre.py", line 4, in <module>
+    from calculs.cylindre import CylindreStirling
+ModuleNotFoundError: No module named 'calculs'
+
+[ERREUR] Code retour : 1
+
+==================================================
+
+
+########## 6/11 : test_displacer.py ##########
+
+Commande lancée : C:\Users\alpha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe D:\Documents\GitHub\sterling_CAO\tests\test_displacer.py
+
+=== STDOUT ===
+
+=== STDERR ===
+Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_displacer.py", line 4, in <module>
+    from calculs.displacer import DisplacerStirling
+ModuleNotFoundError: No module named 'calculs'
+
+[ERREUR] Code retour : 1
+
+==================================================
+
+
+########## 7/11 : test_joints.py ##########
+
+Commande lancée : C:\Users\alpha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe D:\Documents\GitHub\sterling_CAO\tests\test_joints.py
+
+=== STDOUT ===
+
+=== STDERR ===
+Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_joints.py", line 4, in <module>
+    from calculs.joints import trouve_joint_torique, nb_joints_requis
+ModuleNotFoundError: No module named 'calculs'
+
+[ERREUR] Code retour : 1
+
+==================================================
+
+
+########## 8/11 : test_stirling.py ##########
+
+Commande lancée : C:\Users\alpha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe D:\Documents\GitHub\sterling_CAO\tests\test_stirling.py
+
+=== STDOUT ===
+
+=== STDERR ===
+Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_stirling.py", line 5, in <module>
+    import calculs.stirling as st
+ModuleNotFoundError: No module named 'calculs'
+
+[ERREUR] Code retour : 1
+
+==================================================
+
+
+########## 9/11 : test_support_roulement.py ##########
+
+Commande lancée : C:\Users\alpha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe D:\Documents\GitHub\sterling_CAO\tests\test_support_roulement.py
+
+=== STDOUT ===
+
+=== STDERR ===
+Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_support_roulement.py", line 6, in <module>
+    from calculs.support_roulement import SupportRoulement, choix_roulement, ROULEMENTS_ISO, MATERIAUX_SUPP
+ModuleNotFoundError: No module named 'calculs'
+
+[ERREUR] Code retour : 1
+
+==================================================
+
+
+########## 10/11 : test_villebrequin.py ##########
+
+Commande lancée : C:\Users\alpha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe D:\Documents\GitHub\sterling_CAO\tests\test_villebrequin.py
+
+=== STDOUT ===
+
+=== STDERR ===
+Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_villebrequin.py", line 5, in <module>
+    from calculs.villebrequin import VillebrequinStirling
+ModuleNotFoundError: No module named 'calculs'
+
+[ERREUR] Code retour : 1
+
+==================================================
+
+
+########## 11/11 : test_visserie.py ##########
+
+Commande lancée : C:\Users\alpha\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe D:\Documents\GitHub\sterling_CAO\tests\test_visserie.py
+
+=== STDOUT ===
+
+=== STDERR ===
+Traceback (most recent call last):
+  File "D:\Documents\GitHub\sterling_CAO\tests\test_visserie.py", line 4, in <module>
+    from calculs.visserie import (
+        get_vis, resistance_vis, perçage_taraudage_recommande, check_assemblage, calc_visserie
+    )
+ModuleNotFoundError: No module named 'calculs'
+
+[ERREUR] Code retour : 1
+
+==================================================
