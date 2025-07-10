@@ -5,38 +5,43 @@ import math
 class PistonStirling:
     """
     Modélisation d’un piston de moteur Stirling pour CAO :
-    - Géométrie complète, volume, masse, matière, état de surface, axe, rainures
+    - Géométrie complète, volume, masse, matière, état de surface, axe, rainures.
     """
 
     def __init__(
         self,
         diametre_m,
         hauteur_m,
-        epaisseur_fond_m=0.003,         # Fond du piston (m) typique : 3mm
-        epaisseur_jupe_m=0.002,         # Épaisseur jupe latérale (m) typique : 2mm
-        hauteur_jupe_m=None,            # Hauteur jupe (m) (défaut=hauteur totale - fond)
-        matiere="Alliage AlSi",         # Souvent aluminium pour inertie faible
-        densite_kg_m3=2700,
-        rugosite_um=0.6,
-        etat_surface="Usinage fin",
-        nb_rainures=2,                  # Rainures pour segments/racleurs
-        axe_diam_m=0.008,               # Axe du piston (par défaut 8mm)
-        axe_longueur_m=None             # Longueur axe (défaut=largeur piston)
+        epaisseur_fond_m,
+        epaisseur_jupe_m,
+        hauteur_jupe_m,
+        matiere,
+        densite_kg_m3,
+        rugosite_um,
+        etat_surface,
+        nb_rainures,
+        axe_diam_m,
+        axe_longueur_m
     ):
-        if diametre_m <= 0 or hauteur_m <= 0 or epaisseur_fond_m <= 0 or epaisseur_jupe_m <= 0:
-            raise ValueError("Dimensions invalides")
+        # Tous les paramètres sont OBLIGATOIRES, aucun défaut accepté.
+        params = [diametre_m, hauteur_m, epaisseur_fond_m, epaisseur_jupe_m, hauteur_jupe_m,
+                  matiere, densite_kg_m3, rugosite_um, etat_surface, nb_rainures, axe_diam_m, axe_longueur_m]
+        if any(x is None for x in params):
+            raise ValueError("Tous les paramètres doivent être explicitement renseignés (aucun défaut accepté).")
+        if diametre_m <= 0 or hauteur_m <= 0 or epaisseur_fond_m <= 0 or epaisseur_jupe_m <= 0 or hauteur_jupe_m <= 0 or axe_diam_m <= 0 or axe_longueur_m <= 0:
+            raise ValueError("Dimensions invalides (doivent être > 0)")
         self.diametre = diametre_m
         self.hauteur = hauteur_m
         self.epaisseur_fond = epaisseur_fond_m
         self.epaisseur_jupe = epaisseur_jupe_m
-        self.hauteur_jupe = hauteur_jupe_m if hauteur_jupe_m else (hauteur_m - epaisseur_fond_m)
+        self.hauteur_jupe = hauteur_jupe_m
         self.matiere = matiere
         self.densite = densite_kg_m3
         self.rugosite = rugosite_um
         self.etat_surface = etat_surface
         self.nb_rainures = nb_rainures
         self.axe_diam = axe_diam_m
-        self.axe_longueur = axe_longueur_m if axe_longueur_m else diametre_m * 1.1
+        self.axe_longueur = axe_longueur_m
 
     @property
     def rayon(self):
@@ -124,13 +129,14 @@ class PistonStirling:
             f"{self.matiere}, Ra={self.rugosite} µm, {self.etat_surface})"
         )
 
-# Exemple d’utilisation :
+# Exemple d’utilisation (aucun paramètre par défaut, tout doit être explicitement donné)
 if __name__ == "__main__":
     piston = PistonStirling(
         diametre_m=0.021,
         hauteur_m=0.018,
         epaisseur_fond_m=0.003,
         epaisseur_jupe_m=0.002,
+        hauteur_jupe_m=0.015,
         matiere="AlSi12",
         densite_kg_m3=2680,
         rugosite_um=0.5,
