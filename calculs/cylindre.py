@@ -1,5 +1,4 @@
 # calculs/cylindre.py
-
 import math
 
 class CylindreStirling:
@@ -23,21 +22,28 @@ class CylindreStirling:
         self,
         diametre_m,
         course_m,
-        epaisseur_m=0.002,
-        matiere="Acier",
-        densite_kg_m3=7850,
-        rugosite_um=0.8,
-        etat_surface="Usinage fin",
-        Tc=300,
-        Th=850,
-        # Visserie associée au couvercle
-        nb_vis=4,
-        dim_vis_iso="M6",
-        entraxe_vis_pct=0.85,
-        limite_rupture_MPa=600  # Limite rupture matière (MPa) typique acier
+        epaisseur_m,
+        matiere,
+        densite_kg_m3,
+        rugosite_um,
+        etat_surface,
+        Tc,
+        Th,
+        nb_vis,
+        dim_vis_iso,
+        entraxe_vis_pct,
+        limite_rupture_MPa
     ):
-        if diametre_m <= 0 or course_m <= 0 or epaisseur_m < 0:
-            raise ValueError("Diamètre, course ou épaisseur non valides (doivent être > 0).")
+        # Contrôles stricts : aucune valeur par défaut, tout doit être explicitement renseigné
+        if any(x is None for x in [
+            diametre_m, course_m, epaisseur_m, matiere, densite_kg_m3, rugosite_um,
+            etat_surface, Tc, Th, nb_vis, dim_vis_iso, entraxe_vis_pct, limite_rupture_MPa
+        ]):
+            raise ValueError("Tous les paramètres sont obligatoires, aucun défaut n’est accepté.")
+
+        if diametre_m <= 0 or course_m <= 0 or epaisseur_m <= 0:
+            raise ValueError("Diamètre, course et épaisseur doivent être strictement positifs.")
+
         self.diametre = diametre_m
         self.course = course_m
         self.epaisseur = epaisseur_m
@@ -142,12 +148,16 @@ class CylindreStirling:
         S_fond = self.surface_fond  # m²
         return self.effort_total_visserie / S_fond if S_fond else 0
 
-    def zone_chaude(self, frac=0.5):
+    def zone_chaude(self, frac):
+        if not (0 < frac <= 1):
+            raise ValueError("Le paramètre frac doit être compris entre 0 exclu et 1 inclus.")
         lz = self.course * frac
         sz = math.pi * self.diametre * lz
         return lz, sz
 
-    def zone_froide(self, frac=0.5):
+    def zone_froide(self, frac):
+        if not (0 < frac <= 1):
+            raise ValueError("Le paramètre frac doit être compris entre 0 exclu et 1 inclus.")
         lz = self.course * frac
         sz = math.pi * self.diametre * lz
         return lz, sz
@@ -186,8 +196,9 @@ class CylindreStirling:
             f"{self.matiere}, Ra={self.rugosite} µm, {self.etat_surface})"
         )
 
-# Exemple d’utilisation :
+# Exemple d’utilisation (tous les paramètres doivent venir d’un calcul préalable, aucune valeur par défaut)
 if __name__ == "__main__":
+    # Tous les paramètres doivent être passés explicitement !
     cyl = CylindreStirling(
         diametre_m=0.022,
         course_m=0.018,

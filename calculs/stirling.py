@@ -1,15 +1,9 @@
+# calculs\stirling.py
 import math
 
 def puissance_stirling(Nc, pm, Vs, f, Th, Tc, eta):
     """
-    Calcule la puissance (W) d'un moteur Stirling.
-    Nc: nb de cylindres
-    pm: pression moyenne (Pa)
-    Vs: volume balayé par cylindre (m³)
-    f: fréquence (Hz)
-    Th: T chaude (K)
-    Tc: T froide (K)
-    eta: rendement (en % ou fractionnaire)
+    Puissance théorique d’un moteur Stirling (W).
     """
     if Th == Tc:
         raise ValueError("Température chaude et froide égales : rendement nul.")
@@ -19,7 +13,7 @@ def puissance_stirling(Nc, pm, Vs, f, Th, Tc, eta):
 
 def volume_balayé(P, Nc, pm, f, Th, Tc, eta):
     """
-    Calcule le volume balayé par cylindre (m³) à partir de la puissance cible.
+    Volume balayé par cylindre (m³) à partir de la puissance cible.
     """
     if Th == Tc:
         raise ValueError("Température chaude et froide égales : impossible.")
@@ -32,7 +26,7 @@ def volume_balayé(P, Nc, pm, f, Th, Tc, eta):
 
 def diametre_cylindre(Vs, C):
     """
-    Retourne le diamètre du cylindre (m) à partir du volume balayé et de la course (en m).
+    Diamètre du cylindre (m) à partir du volume balayé et de la course (m).
     """
     if C <= 0:
         raise ValueError("Course nulle ou négative.")
@@ -40,7 +34,7 @@ def diametre_cylindre(Vs, C):
 
 def course_from_diam(Vs, D):
     """
-    Retourne la course (m) à partir du volume balayé et du diamètre (en m).
+    Course (m) à partir du volume balayé et du diamètre (m).
     """
     if D <= 0:
         raise ValueError("Diamètre nul ou négatif.")
@@ -56,17 +50,42 @@ def course_diam_carre(Vs):
     D = C
     return C, D
 
-def nb_cylindres_meca(P, P_cyl_limite=900):
+def rapport_compression(Vmax, Vmin):
     """
-    Calcule le nombre de cylindres requis pour ne pas dépasser une puissance max par cylindre.
-    P : puissance totale (W)
-    P_cyl_limite : puissance max/cylindre (W)
+    Rapport de compression Rc = Vmax / Vmin
     """
-    return max(2, math.ceil(P / P_cyl_limite))
+    if Vmin <= 0:
+        raise ValueError("Vmin doit être strictement positif.")
+    return Vmax / Vmin
+
+def puissance_specifique(P, masse):
+    """
+    Puissance spécifique (W/kg)
+    """
+    if masse <= 0:
+        raise ValueError("La masse doit être strictement positive.")
+    return P / masse
+
+def pm_necessaire(P, Nc, Vs, f, Th, Tc, eta):
+    """
+    Pression moyenne nécessaire (Pa) pour atteindre la puissance cible.
+    """
+    dT = (Th - Tc) / Th
+    eta = eta / 100 if eta > 1 else eta
+    denom = Nc * Vs * f * dT * eta
+    if denom <= 0:
+        raise ValueError("Paramètres incorrects, division par zéro.")
+    return P / denom
+
+def vitesse_piston(C, f):
+    """
+    Vitesse moyenne du piston (m/s)
+    """
+    return 2 * C * f
 
 def archi_conseillee(Nc):
     """
-    Retourne l'architecture moteur recommandée selon le nombre de cylindres.
+    Architecture moteur recommandée selon le nombre de cylindres.
     """
     if Nc == 2:
         return "À plat (Boxer) ou en ligne"
@@ -81,50 +100,26 @@ def archi_conseillee(Nc):
     else:
         return "En ligne"
 
-def params_par_defaut(P, P_cyl_limite=900):
-    """
-    Retourne des paramètres raisonnables par défaut selon la puissance P (W).
-    """
-    if P < 500:
-        Th = 600
-        pm = 6e5
-        f = 20
-        eta = 0.32
-    elif P < 2500:
-        Th = 750
-        pm = 1e6
-        f = 25
-        eta = 0.36
-    elif P < 10000:
-        Th = 850
-        pm = 1.5e6
-        f = 30
-        eta = 0.40
-    else:
-        Th = 900
-        pm = 2e6
-        f = 40
-        eta = 0.44
+def check_params(**kwargs):
+    """Vérifie que tous les paramètres sont bien renseignés et corrects"""
+    required = ['P', 'Th', 'Tc', 'pm', 'f', 'Nc', 'eta']
+    for k in required:
+        v = kwargs.get(k)
+        if v is None:
+            raise ValueError(f"Le paramètre {k} est obligatoire et doit être renseigné.")
+        if isinstance(v, (int, float)) and v <= 0 and k != "Tc":
+            raise ValueError(f"Le paramètre {k} doit être strictement positif.")
+    if kwargs.get("Th") == kwargs.get("Tc"):
+        raise ValueError("Température chaude et froide égales : calcul impossible.")
 
-    Nc = nb_cylindres_meca(P, P_cyl_limite)
-    Tc = 300
-    return dict(Th=Th, Tc=Tc, pm=pm, f=f, Nc=Nc, eta=eta)
-
-def calcul_complet(P, Th=None, Tc=None, pm=None, f=None, Nc=None, eta=None, C=None, gaz="Air", P_cyl_limite=900):
+def calcul_complet(P, Th, Tc, pm, f, Nc, eta, C=None, gaz="Air"):
     """
-    Résumé complet des paramètres moteur Stirling, avec ajustement automatique des manquants.
+    Calcul strict : aucun paramètre n’est déduit ni par défaut.
+    Tout manque lève une ValueError.
     """
-    auto = params_par_defaut(P, P_cyl_limite)
-    Th = Th or auto['Th']
-    Tc = Tc or auto['Tc']
-    pm = pm or auto['pm']
-    f = f or auto['f']
-    Nc = Nc or auto['Nc']
-    eta = eta or auto['eta']
-
+    check_params(P=P, Th=Th, Tc=Tc, pm=pm, f=f, Nc=Nc, eta=eta)
     Vs = volume_balayé(P, Nc, pm, f, Th, Tc, eta)
 
-    # Si course donnée, calcul du diamètre, sinon cylindre carré
     if C:
         D = diametre_cylindre(Vs, C)
         course_effective = C
@@ -132,6 +127,7 @@ def calcul_complet(P, Th=None, Tc=None, pm=None, f=None, Nc=None, eta=None, C=No
         course_effective, D = course_diam_carre(Vs)
 
     archi = archi_conseillee(Nc)
+    v_pist = vitesse_piston(course_effective, f)
 
     return {
         "Puissance_W": P,
@@ -146,4 +142,6 @@ def calcul_complet(P, Th=None, Tc=None, pm=None, f=None, Nc=None, eta=None, C=No
         "Course_m": course_effective,
         "Diametre_m": D,
         "Architecture": archi,
+        "Vitesse_piston_m_s": v_pist,
+        # Placeholders pour Rc et puissance spécifique à remplir lors du design final
     }

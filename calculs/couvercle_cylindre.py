@@ -1,5 +1,4 @@
 # calculs/couvercle_cylindre.py
-
 import math
 
 class CouvercleCylindreStirling:
@@ -23,27 +22,35 @@ class CouvercleCylindreStirling:
 
     def __init__(
         self,
-        diametre_m,                         # Diamètre du cylindre/couvercle (m)
-        epaisseur_m=0.005,                  # Épaisseur couvercle (m)
-        matiere="Acier inox",
-        densite_kg_m3=7900,
-        rugosite_um=1.2,
-        etat_surface="Rectifié fin",
-        type_couvercle="plat",              # "plat" ou "bombé"
+        diametre_m,                   # Diamètre du cylindre/couvercle (m)
+        epaisseur_m,                  # Épaisseur couvercle (m)
+        matiere,
+        densite_kg_m3,
+        rugosite_um,
+        etat_surface,
+        type_couvercle,               # "plat" ou "bombé"
         # Entrées d’air principales
-        diam_entrée_air_m=0.008,
-        nb_entree_air=1,
+        diam_entrée_air_m,
+        nb_entree_air,
         # Entrée brûleur
-        diam_entrée_bruleur_m=0.012,
-        nb_entree_bruleur=1,
-        distance_bruleur_centre_m=None,
+        diam_entrée_bruleur_m,
+        nb_entree_bruleur,
+        distance_bruleur_centre_m,
         # Taraudages de fixation ISO
-        nb_vis=4,
-        dim_vis_iso="M6",
-        entraxe_vis_pct=0.85   # % du rayon utilisé pour l'entraxe (0.8~0.9)
+        nb_vis,
+        dim_vis_iso,
+        entraxe_vis_pct
     ):
+        # Aucun paramètre par défaut, tout doit être fourni
+        if any(x is None for x in [
+            diametre_m, epaisseur_m, matiere, densite_kg_m3, rugosite_um,
+            etat_surface, type_couvercle, diam_entrée_air_m, nb_entree_air,
+            diam_entrée_bruleur_m, nb_entree_bruleur, distance_bruleur_centre_m,
+            nb_vis, dim_vis_iso, entraxe_vis_pct
+        ]):
+            raise ValueError("Tous les paramètres doivent être explicitement renseignés (aucun défaut accepté).")
         if diametre_m <= 0 or epaisseur_m <= 0:
-            raise ValueError("Dimensions invalides")
+            raise ValueError("Dimensions invalides (doivent être > 0)")
         self.diametre = diametre_m
         self.epaisseur = epaisseur_m
         self.matiere = matiere
@@ -55,13 +62,12 @@ class CouvercleCylindreStirling:
         self.nb_entree_air = nb_entree_air
         self.diam_entrée_bruleur = diam_entrée_bruleur_m
         self.nb_entree_bruleur = nb_entree_bruleur
-        self.distance_bruleur_centre = distance_bruleur_centre_m if distance_bruleur_centre_m is not None else 0.0
-        # Taraudage ISO
+        self.distance_bruleur_centre = distance_bruleur_centre_m
         self.nb_vis = nb_vis
         self.dim_vis_iso = dim_vis_iso
         self.diam_percage_vis = self.DIAM_PERCAGE_TARAUD_ISO.get(dim_vis_iso, 5.0) / 1000.0  # en mètre
-        self.diam_taraudage_nominal = int(dim_vis_iso[1:]) / 1000.0 if dim_vis_iso.startswith("M") else 0.006 # mm -> m
-        self.entraxe_vis = (self.diametre / 2) * entraxe_vis_pct  # rayon d’entraxe (m)
+        self.diam_taraudage_nominal = int(dim_vis_iso[1:]) / 1000.0 if dim_vis_iso.startswith("M") else 0.006
+        self.entraxe_vis = (self.diametre / 2) * entraxe_vis_pct
         self.entraxe_vis_pct = entraxe_vis_pct
 
     @property
@@ -86,10 +92,8 @@ class CouvercleCylindreStirling:
 
     @property
     def volume_percages(self):
-        # Entrées d’air
         v_entree_air = self.nb_entree_air * math.pi * (self.diam_entrée_air / 2) ** 2 * self.epaisseur
         v_entree_bruleur = self.nb_entree_bruleur * math.pi * (self.diam_entrée_bruleur / 2) ** 2 * self.epaisseur
-        # Trous pour taraudage (diamètre de perçage ISO)
         v_percage_vis = self.nb_vis * math.pi * (self.diam_percage_vis / 2) ** 2 * self.epaisseur
         return v_entree_air + v_entree_bruleur + v_percage_vis
 
@@ -105,19 +109,17 @@ class CouvercleCylindreStirling:
     @property
     def profondeur_taraudage(self):
         """
-        Profondeur de taraudage recommandée : 1x à 1.5x diamètre nominal pour l'acier.
-        (ici, min = 1x diam)
+        Profondeur de taraudage recommandée : 1x à 1.5x diamètre nominal pour l'acier (min : 1x diam)
         """
-        return round(self.diam_taraudage_nominal * 1000, 2)  # en mm
+        return round(self.diam_taraudage_nominal * 1000, 2)  # mm
 
     @property
     def perçage_vis(self):
         """Renvoie (x, y) des centres de perçages sur le cercle d’entraxe (mm)"""
         result = []
-        angle0 = 0  # Peut ajouter un décalage angulaire si besoin
         r = self.entraxe_vis * 1000  # mm
         for i in range(self.nb_vis):
-            a = angle0 + 2 * math.pi * i / self.nb_vis
+            a = 2 * math.pi * i / self.nb_vis
             x = r * math.cos(a)
             y = r * math.sin(a)
             result.append((round(x, 2), round(y, 2)))
@@ -157,7 +159,7 @@ class CouvercleCylindreStirling:
             f"{self.matiere}, Ra={self.rugosite} µm)"
         )
 
-# Exemple d’utilisation :
+# Exemple d’utilisation (tous les paramètres sont obligatoires, aucun défaut)
 if __name__ == "__main__":
     couvercle = CouvercleCylindreStirling(
         diametre_m=0.022,

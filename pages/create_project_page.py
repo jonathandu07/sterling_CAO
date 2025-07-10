@@ -5,14 +5,21 @@ from tkinter import ttk
 from colors import *
 from project_db import save_project, get_aes_key
 
-# Importe le module de calcul dynamique
+# Importe tous les modules de calculs nécessaires
 from calculs.stirling import calcul_complet
+from calculs.cylindre import CylindreStirling
+from calculs.piston import PistonStirling
+from calculs.bielle import BielleStirling
+from calculs.visserie import calc_visserie
+from calculs.joints import calc_joints
+from calculs.support_roulement import SupportRoulement
 
 class CreateProjectPage(tk.Frame):
     def __init__(self, master):
         super().__init__(master, bg=BG)
         self.master = master
         self.tech_sheet = None
+        self.parts_resume = None
         self.validated = False
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -173,6 +180,7 @@ class CreateProjectPage(tk.Frame):
         self.btn_continue.config(state="disabled")
         self.btn_save.config(state="disabled")
         self.validated = False
+        self.parts_resume = None
 
     def validate_tech_sheet(self):
         if not self.tech_sheet:
@@ -217,5 +225,75 @@ class CreateProjectPage(tk.Frame):
         if not self.validated:
             self.update_summary("Valide d'abord le cahier technique.", color=RV)
             return
-        print("Redirection vers le listing des pièces nécessaires…")
-        # self.master.show_page(PartsListPage, self.tech_sheet)
+        self.generate_parts_summary()
+
+    def generate_parts_summary(self):
+        """Génère le résumé technique complet des pièces à partir du cahier technique validé."""
+        tech = self.tech_sheet
+        try:
+            cyl = CylindreStirling(
+                diametre_m=tech["Diametre_m"],
+                course_m=tech["Course_m"],
+                epaisseur_m=0.002,  # à personnaliser selon projet
+                matiere="Acier",
+                densite_kg_m3=7850,
+                rugosite_um=0.8,
+                etat_surface="Usinage fin",
+                Th=tech["Temp_chaud_K"],
+                Tc=tech["Temp_froid_K"],
+                nb_vis=6,
+                dim_vis_iso="M6",
+                entraxe_vis_pct=0.85,
+                limite_rupture_MPa=700
+            )
+            piston = PistonStirling(
+                diametre_m=tech["Diametre_m"]-0.0002,
+                hauteur_m=tech["Course_m"]*0.95,
+                epaisseur_fond_m=0.003,
+                epaisseur_jupe_m=0.002,
+                matiere="AlSi12",
+                densite_kg_m3=2680,
+                rugosite_um=0.6,
+                etat_surface="Microbillage + rectif",
+                nb_rainures=2,
+                axe_diam_m=0.008,
+                axe_longueur_m=tech["Diametre_m"]*1.1
+            )
+            bielle = BielleStirling(
+                longueur_m=tech["Course_m"]*2.6,
+                largeur_corps_m=0.012,
+                epaisseur_corps_m=0.004,
+                diametre_tete_m=0.018,
+                diametre_pied_m=0.010,
+                axe_tete_diam_m=0.008,
+                axe_pied_diam_m=0.008,
+                matiere="Acier 42CrMo4",
+                densite_kg_m3=7850,
+                etat_surface="Usinage + rectif",
+                rugosite_um=0.8
+            )
+            vis = calc_visserie(
+                cyl.nb_vis, cyl.dim_vis_iso, cyl.diam_percage_vis, cyl.epaisseur, cyl.entraxe_vis
+            )
+            joints = calc_joints(
+                diametre_arbre=tech["Diametre_m"],
+                profondeur=0.002,
+                pression=tech["Pression_Pa"] if "Pression_Pa" in tech else 100000
+            )
+            roulement = SupportRoulement(
+                d_arbre_mm=8, charge_radiale_N=2000, matiere="Acier"
+            )
+
+            resume = f"=== Résumé des pièces principales ===\n"
+            resume += f"[Cylindre]\n{cyl}\n{cyl.to_dict()}\n\n"
+            resume += f"[Piston]\n{piston}\n{piston.to_dict()}\n\n"
+            resume += f"[Bielle]\n{bielle}\n{bielle.to_dict()}\n\n"
+            resume += f"[Visserie]\n{vis}\n\n"
+            resume += f"[Joints toriques]\n{joints}\n\n"
+            resume += f"[Roulement]\n{roulement}\n{roulement.to_dict()}\n\n"
+
+            self.update_summary(resume, color=JV)
+            self.parts_resume = resume
+        except Exception as e:
+            self.update_summary(f"Erreur lors du calcul des pièces : {e}", color=RV)
+            self.parts_resume = None
