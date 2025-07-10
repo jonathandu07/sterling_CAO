@@ -34,7 +34,7 @@ class CylindreStirling:
         entraxe_vis_pct,
         limite_rupture_MPa
     ):
-        # Contrôles stricts : aucune valeur par défaut, tout doit être explicitement renseigné
+        # Contrôles stricts : aucune valeur par défaut, tout doit être explicitement renseigné
         if any(x is None for x in [
             diametre_m, course_m, epaisseur_m, matiere, densite_kg_m3, rugosite_um,
             etat_surface, Tc, Th, nb_vis, dim_vis_iso, entraxe_vis_pct, limite_rupture_MPa
@@ -43,6 +43,16 @@ class CylindreStirling:
 
         if diametre_m <= 0 or course_m <= 0 or epaisseur_m <= 0:
             raise ValueError("Diamètre, course et épaisseur doivent être strictement positifs.")
+
+        # Récupération diamètre perçage vis en mm
+        diam_percage_mm = self.DIAM_PERCAGE_TARAUD_ISO.get(dim_vis_iso, 5.0)
+
+        # Vérification que l’épaisseur est au moins égale au diamètre perçage vis (en m)
+        epaisseur_min = diam_percage_mm / 1000.0  # Converti en mètres
+        if epaisseur_m < epaisseur_min:
+            print(f"Attention : épaisseur de paroi {epaisseur_m*1000:.1f} mm trop faible pour vis {dim_vis_iso} "
+                  f"(minimum requis {epaisseur_min*1000:.1f} mm). Ajustement automatique.")
+            epaisseur_m = epaisseur_min
 
         self.diametre = diametre_m
         self.course = course_m
@@ -56,7 +66,7 @@ class CylindreStirling:
         # Visserie
         self.nb_vis = nb_vis
         self.dim_vis_iso = dim_vis_iso
-        self.diam_percage_vis = self.DIAM_PERCAGE_TARAUD_ISO.get(dim_vis_iso, 5.0) / 1000.0  # m
+        self.diam_percage_vis = diam_percage_mm / 1000.0  # m
         self.diam_taraudage_nominal = int(dim_vis_iso[1:]) / 1000.0 if dim_vis_iso.startswith("M") else 0.006
         self.entraxe_vis = (self.diametre / 2) * entraxe_vis_pct
         self.entraxe_vis_pct = entraxe_vis_pct
@@ -196,13 +206,14 @@ class CylindreStirling:
             f"{self.matiere}, Ra={self.rugosite} µm, {self.etat_surface})"
         )
 
+
 # Exemple d’utilisation (tous les paramètres doivent venir d’un calcul préalable, aucune valeur par défaut)
 if __name__ == "__main__":
     # Tous les paramètres doivent être passés explicitement !
     cyl = CylindreStirling(
         diametre_m=0.022,
         course_m=0.018,
-        epaisseur_m=0.002,
+        epaisseur_m=0.005,  # corrigé pour être compatible M6
         matiere="Acier inox 316L",
         densite_kg_m3=8000,
         rugosite_um=0.4,
