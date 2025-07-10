@@ -317,3 +317,66 @@ Le SHSE-M est piloté par une gestion informatique avancée, qui ajuste dynamiqu
     - Ajustement dynamique entre combustion, air comprimé et batterie en fonction de la situation.
 
 ---
+# 🧩 Liste des pièces pour moteur Stirling (architecture simple à piston déplacé)
+
+## 1. Bloc moteur
+- **Cylindre principal**
+  - Matériau : acier, inox, aluminium, fonte, ou composite haute température
+- **Tête chaude** (partie supérieure, chauffée)
+  - Souvent épaisse, matériau réfractaire ou métal traité
+- **Tête froide** (partie inférieure, refroidie)
+  - Aluminium, cuivre, ou tout métal à haute conductivité thermique
+- **Corps de séparation** (zone entre chaud et froid, parfois intégrée au cylindre)
+
+## 2. Mécanique interne
+- **Piston moteur** (mobile, transmet l’énergie)
+  - Joints toriques ou segments (étanchéité mobile)
+  - Matériau : alu, acier ou composite spécial
+- **Displacer** (galette mobile, sépare chaud et froid, n’assure PAS l’étanchéité)
+  - Mousse ou métal léger (structure allégée)
+  - Tige de guidage
+- **Axe de guidage du displacer** (tige traversant le bloc, basse friction)
+- **Bielle de piston** (liaison piston ↔ vilebrequin)
+- **Bielle du displacer** (liaison galette ↔ excentrique)
+- **Vilebrequin** (manivelle principale)
+- **Palier(s) et bagues de guidage** (pour les axes, limiter les frottements)
+- **Volant d’inertie** (pour la régularité de rotation, souvent sur le vilebrequin)
+
+## 3. Enveloppe et interfaces
+- **Chambres d’étanchéité** (pour la pression interne, si gaz pressurisé)
+- **Joints d’étanchéité statiques/dynamiques** (piston, axes, têtes)
+- **Couvercle de protection** (sécurité, poussière, isolement thermique)
+- **Supports/Châssis** (fixation du moteur et des accessoires)
+
+## 4. Systèmes thermiques
+- **Échangeur de chaleur chaud** (foyer, brûleur, résistance, concentrateur solaire…)
+- **Échangeur de chaleur froid** (ailettes, radiateur à eau, ventilateur, pompe)
+- **Isolation thermique** (entre zone chaude et froide, limiter les pertes)
+
+## 5. Accessoires & instrumentation
+- **Capteur de température** (tête chaude, tête froide)
+- **Manomètre (pression gaz, optionnel)**
+- **Soupape de sécurité** (pour surpression, si moteur pressurisé)
+- **Vanne de remplissage gaz** (air, hélium, hydrogène…)
+
+## 6. Transmission & sortie mécanique
+- **Accouplement** (pour relier l’arbre du moteur à la charge : alternateur, boîte, etc.)
+- **Arbre de sortie** (peut être intégré au vilebrequin ou séparé)
+- **Poulie, engrenage, ou embrayage** (si transmission indirecte)
+- **Visserie, goupilles, clavettes, éléments de fixation**
+
+---
+
+## **Résumé schématique**
+1. **Cylindre** (zone chaude & froide)
+2. **Displacer** (galette)
+3. **Piston moteur**
+4. **Bielle(s)**
+5. **Vilebrequin**
+6. **Volant d’inertie**
+7. **Bloc d’échange thermique chaud/froid**
+8. **Joints d’étanchéité**
+9. **Châssis/support**
+10. **Systèmes de mesure & sécurité**
+
+---
