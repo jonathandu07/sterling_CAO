@@ -1,3 +1,4 @@
+# pages\home_page.py
 import tkinter as tk
 from colors import *
 from pages.create_project_page import CreateProjectPage  # Ajoute ceci !

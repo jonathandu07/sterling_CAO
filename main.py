@@ -7,20 +7,18 @@ class MainApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Assistant CAO")
-        self.geometry("700x500")
+        self.geometry("900x700")           # Taille adaptée au confort visuel
         self.configure(bg=BG)
-        self.resizable(False, False)
+        self.resizable(True, True)         # Autorise le redimensionnement
         self.current_frame = None
 
-        # Pour charger la première page (Accueil)
         self.show_page(HomePage)
 
-    def show_page(self, PageClass):
-        # Détruit la page courante si elle existe
+    def show_page(self, PageClass, *args, **kwargs):
+        """Affiche la page demandée (remplace l'actuelle)."""
         if self.current_frame:
             self.current_frame.destroy()
-        # Affiche la nouvelle page
-        self.current_frame = PageClass(self)
+        self.current_frame = PageClass(self, *args, **kwargs)
         self.current_frame.pack(fill="both", expand=True)
 
 if __name__ == "__main__":

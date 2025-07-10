@@ -11,8 +11,9 @@ from calculs.cylindre import CylindreStirling
 from calculs.piston import PistonStirling
 from calculs.bielle import BielleStirling
 from calculs.visserie import calc_visserie
-from calculs.joints import calc_joints
+from calculs.joints import trouve_joint_torique, nb_joints_requis
 from calculs.support_roulement import SupportRoulement
+from pages.parts_menu_page import PartsMenuPage
 
 class CreateProjectPage(tk.Frame):
     def __init__(self, master):
@@ -39,8 +40,8 @@ class CreateProjectPage(tk.Frame):
         fields = [
             ("Nom du projet *", "name"),
             ("Puissance cible (W) *", "P"),
-            ("Temp. chaude (K)", "Th"),
-            ("Temp. froide (K)", "Tc"),
+            ("Temp. chaude (°C)", "Th"),
+            ("Temp. froide (°C)", "Tc"),
             ("Rendement (%)", "eta"),
             ("Pression gaz (bar)", "pm"),
             ("Fréquence (Hz)", "f"),
@@ -136,51 +137,66 @@ class CreateProjectPage(tk.Frame):
         # Récupère la puissance (obligatoire)
         try:
             P = float(self.inputs["P"].get().strip())
-            if P <= 0: raise Exception()
+            if P <= 0:
+                raise Exception()
         except Exception:
             self.update_summary("Tu dois saisir la puissance cible (en W).", color=RV)
             self.tech_sheet = None
             self.btn_validate.config(state="disabled")
             return
 
-        # Récupère ou laisse vide les champs personnalisés (ils seront surchargés si vides)
+        # On récupère tout le reste, même si c'est vide
         champs = ["Th", "Tc", "eta", "pm", "f", "Nc", "C"]
         params = {}
         for key in champs:
             val = self.inputs[key].get().strip()
             params[key] = float(val) if val else None
-        params["Nc"] = int(params["Nc"]) if params["Nc"] is not None else None
+
+        # Conversion des températures utilisateur °C -> K pour l'appel à calcul_complet (il attend des K à l'entrée)
+        if params["Th"] is not None:
+            params["Th"] += 273.15
+        if params["Tc"] is not None:
+            params["Tc"] += 273.15
+
         gaz = self.gaz_var.get() or "Air"
 
-        # Calcul complet via le module calculs.stirling
-        tech = calcul_complet(
-            P=P,
-            Th=params["Th"],
-            Tc=params["Tc"],
-            pm=params["pm"]*1e5 if params["pm"] else None,  # Conversion bar → Pa
-            f=params["f"],
-            Nc=params["Nc"],
-            eta=params["eta"],
-            C=params["C"]/1000 if params["C"] else None,    # mm → m
-            gaz=gaz
-        )
+        try:
+            tech = calcul_complet(
+                P=P,
+                Th=params["Th"],
+                Tc=params["Tc"],
+                pm=params["pm"] * 1e5 if params["pm"] else None,  # bar → Pa
+                f=params["f"],
+                Nc=int(params["Nc"]) if params["Nc"] else None,
+                eta=params["eta"],
+                C=params["C"] / 1000 if params["C"] else None,    # mm → m
+                gaz=gaz
+            )
 
-        resume = f"Cahier des charges technique généré :\n"
-        resume += f" - Volume balayé/cyl : {tech['Volume_balayé_m3']*1e6:.2f} cm³\n"
-        resume += f" - Diamètre cyl. : {tech['Diametre_m']*100:.2f} mm\n"
-        resume += f" - Course : {tech['Course_m']*1000:.2f} mm\n"
-        resume += f" - Nb cylindres : {tech['Nb_cylindres']}\n"
-        resume += f" - Gaz de travail : {tech['Gaz']}\n"
-        resume += f" - Architecture suggérée : {tech['Architecture']}\n"
-        self.update_summary(resume, color=VO)
+            resume = f"Cahier des charges technique généré :\n"
+            resume += f" - Température chaude : {tech['Temp_chaud_C']:.1f} °C\n"
+            resume += f" - Température froide : {tech['Temp_froid_C']:.1f} °C\n"
+            resume += f" - Volume balayé/cyl : {tech['Volume_balayé_m3']*1e6:.2f} cm³\n"
+            resume += f" - Diamètre cyl. : {tech['Diametre_m']*100:.2f} mm\n"
+            resume += f" - Course : {tech['Course_m']*1000:.2f} mm\n"
+            resume += f" - Nb cylindres : {tech['Nb_cylindres'] if 'Nb_cylindres' in tech else tech['Nb_cylindres']}\n"
+            resume += f" - Gaz de travail : {tech['Gaz']}\n"
+            resume += f" - Architecture suggérée : {tech['Architecture']}\n"
+            self.update_summary(resume, color=VO)
 
-        self.tech_sheet = tech
-        self.btn_validate.config(state="normal")
-        self.btn_edit.config(state="disabled")
-        self.btn_continue.config(state="disabled")
-        self.btn_save.config(state="disabled")
-        self.validated = False
-        self.parts_resume = None
+            self.tech_sheet = tech
+            self.btn_validate.config(state="normal")
+            self.btn_edit.config(state="disabled")
+            self.btn_continue.config(state="disabled")
+            self.btn_save.config(state="disabled")
+            self.validated = False
+            self.parts_resume = None
+
+        except Exception as e:
+            self.update_summary(f"Erreur de calcul : {str(e)}", color=RV)
+            self.tech_sheet = None
+            self.btn_validate.config(state="disabled")
+            return
 
     def validate_tech_sheet(self):
         if not self.tech_sheet:
@@ -196,6 +212,9 @@ class CreateProjectPage(tk.Frame):
         self.update_summary("Cahier technique validé. Tu peux continuer ou sauvegarder.\n\n"
                             + self.tech_label.get("1.0", tk.END), color=JV)
         self.validated = True
+        # Dirige vers le menu pièces
+        self.master.show_page(PartsMenuPage, self.tech_sheet)
+
 
     def edit_tech_sheet(self):
         for entry in self.inputs.values():

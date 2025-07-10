@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 # tests\test_visserie.py
 
 import traceback
@@ -5,7 +8,7 @@ from calculs.visserie import (
     get_vis, resistance_vis, perçage_taraudage_recommande, check_assemblage, calc_visserie
 )
 import sys, os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 
 def print_sep(title):
     print("\n" + "="*10 + f" {title} " + "="*10)

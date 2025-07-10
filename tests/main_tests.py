@@ -1,4 +1,4 @@
-# tests\main_tests.py
+# tests/main_tests.py
 
 import subprocess
 import sys
@@ -26,9 +26,16 @@ def auto_patch_tests(tests_dir):
             fpath = os.path.join(tests_dir, fname)
             with open(fpath, encoding="utf-8") as f:
                 content = f.read()
-            if PATCH not in content:
+            # On ne repatche pas si déjà présent (sur une des 2 lignes)
+            if PATCH.splitlines()[0] not in content:
+                # Ajout du patch tout en haut (juste après un shebang éventuel)
+                lines = content.splitlines()
+                if lines and lines[0].startswith("#!"):
+                    new_content = lines[0] + "\n" + PATCH + "\n" + "\n".join(lines[1:]) + "\n"
+                else:
+                    new_content = PATCH + "\n" + content
                 with open(fpath, "w", encoding="utf-8") as f:
-                    f.write(PATCH + "\n" + content)
+                    f.write(new_content)
                 patched.append(fname)
     if patched:
         print(f"Patching sys.path dans : {', '.join(patched)}")
