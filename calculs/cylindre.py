@@ -208,8 +208,8 @@ class CylindreStirling:
 
     def __repr__(self):
         return (
-            f\"CylindreStirling(D={self.diametre*1000:.2f} mm, C={self.course*1000:.2f} mm, "
+            f"CylindreStirling(D={self.diametre*1000:.2f} mm, C={self.course*1000:.2f} mm, "
             f"e={self.epaisseur*1000:.2f} mm, vis={self.nb_vis}x{self.dim_vis_iso}, "
             f"Rupture: {self.pression_maxi_admissible/1e5:.1f} bar, "
-            f"{self.matiere}, Ra={self.rugosite} µm, {self.etat_surface})\"
+            f"{self.matiere}, Ra={self.rugosite} µm, {self.etat_surface})"
         )

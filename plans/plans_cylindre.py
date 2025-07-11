@@ -45,7 +45,7 @@ def plot_cylindre(cyl: CylindreStirling, output_path="plan_cylindre.png"):
     ax.add_patch(fond)
 
     # Visserie (projection sur fond gauche)
-    for (_, y) in cyl.perçage_vis:
+    for (_, y) in cyl.percage_vis:
         ax.add_patch(Circle(
             (0, y), 
             cyl.diam_percage_vis * 1000 / 2, 
@@ -54,7 +54,7 @@ def plot_cylindre(cyl: CylindreStirling, output_path="plan_cylindre.png"):
         ax.text(-12, y, f"M{cyl.dim_vis_iso[1:]}", fontsize=9, color='red', verticalalignment='center')
 
     # Légende visserie
-    ax.text(-12, r_ext + 10, "Visserie (M6)", fontsize=9, color='red', verticalalignment='center')
+    ax.text(-12, r_ext + 10, f"Visserie ({cyl.dim_vis_iso})", fontsize=9, color='red', verticalalignment='center')
 
     # Annotations cotes principales
     arrowprops = dict(arrowstyle='<->', linewidth=1.2, color='black')
@@ -73,7 +73,7 @@ def plot_cylindre(cyl: CylindreStirling, output_path="plan_cylindre.png"):
 
     dx = course * 0.4
     dy = r_ext * 2
-    dz = r_ext * 2  # hauteur imaginaire
+    dz = r_ext * 2
 
     p1 = np.array([iso_x, iso_y])
     p2 = p1 + np.array([dx * 0.866, dx * 0.5])
@@ -98,7 +98,7 @@ def plot_cylindre(cyl: CylindreStirling, output_path="plan_cylindre.png"):
                        closed=True, fill=None, edgecolor='black', linewidth=1.5)
     ax.add_patch(poly_top)
 
-    # Cartouche simple en bas à droite
+    # Cartouche
     cartouche_x = course * 1.3
     cartouche_y = -r_ext * 1.1
     cartouche_width = 170
