@@ -5,12 +5,12 @@ import math
 
 # Valeurs physiques par défaut (réalistes mais adaptables)
 DEFAULTS = {
-    'Th': 650.0,      # Temp. chaude (K), ~377°C
-    'Tc': 300.0,      # Temp. froide (K), ~27°C
-    'pm': 1e6,        # Pression (Pa), 10 bar
-    'f': 25.0,        # Fréquence (Hz)
-    'Nc': 2,          # Cylindres
-    'eta': 0.20,      # Rendement (20%)
+    'Th': 650.0,
+    'Tc': 300.0,
+    'pm': 1e6,
+    'f': 25.0,
+    'Nc': 2,
+    'eta': 0.20,
 }
 
 # Données matériaux (densité en kg/m³, limite rupture en Pa)
@@ -51,7 +51,7 @@ def puissance_stirling(Nc, pm, Vs, f, Th, Tc, eta):
     eta = eta / 100 if eta > 1 else eta
     return Nc * pm * Vs * f * dT * eta
 
-def volume_balayé(P, Nc, pm, f, Th, Tc, eta):
+def volume_balaye(P, Nc, pm, f, Th, Tc, eta):
     Th, Tc, eta = float(Th), float(Tc), float(eta)
     if abs(Th - Tc) < 1e-8 or Th <= 0 or Tc < 0:
         return 0.0
@@ -144,7 +144,7 @@ def calcul_complet(P, Th=None, Tc=None, pm=None, f=None, Nc=None, eta=None, C=No
 
     mat_data = MATERIAUX.get(materiau, MATERIAUX["Acier"])
 
-    Vs = volume_balayé(float(P), Nc, pm, f, Th, Tc, eta)
+    Vs = volume_balaye(float(P), Nc, pm, f, Th, Tc, eta)
 
     if C is not None and C != "":
         course_effective = float(C)

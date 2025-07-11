@@ -68,6 +68,24 @@ class CylindreStirling:
         self.entraxe_vis_pct = entraxe_vis_pct
         self.limite_rupture_MPa = limite_rupture_MPa
 
+    @classmethod
+    def depuis_donnees_stirling(cls, data):
+        return cls(
+            diametre_m = data["D"]/1000,
+            course_m = data["C"]/1000,
+            epaisseur_m = 0.003,
+            matiere = "Acier XC48",
+            densite_kg_m3 = 7850,
+            rugosite_um = 1.6,
+            etat_surface = "Usinée",
+            Tc = data["Tc"],
+            Th = data["Th"],
+            nb_vis = 6,
+            dim_vis_iso = "M6",
+            entraxe_vis_pct = 0.8,
+            limite_rupture_MPa = 400
+        )
+
     @property
     def rayon(self):
         return self.diametre / 2
@@ -117,7 +135,7 @@ class CylindreStirling:
         return self.surface_externe + 2 * sf
 
     @property
-    def perçage_vis(self):
+    def percage_vis(self):
         result = []
         r = self.entraxe_vis * 1000
         for i in range(self.nb_vis):
@@ -181,7 +199,7 @@ class CylindreStirling:
             "Nb vis": self.nb_vis,
             "Diam. perçage taraudage (mm)": round(self.diam_percage_vis * 1000, 2),
             "Rayon entraxe vis (mm)": round(self.entraxe_vis * 1000, 2),
-            "Positions vis (mm)": self.perçage_vis,
+            "Positions vis (mm)": self.percage_vis,
             "Section paroi autour vis (mm2)": round(self.section_anneau_autour_taraudage, 2),
             "Effort max/vis (N)": int(self.effort_max_admissible_par_taraudage),
             "Effort total visserie (N)": int(self.effort_total_visserie),
@@ -190,56 +208,8 @@ class CylindreStirling:
 
     def __repr__(self):
         return (
-            f"CylindreStirling(D={self.diametre*1000:.2f} mm, C={self.course*1000:.2f} mm, "
+            f\"CylindreStirling(D={self.diametre*1000:.2f} mm, C={self.course*1000:.2f} mm, "
             f"e={self.epaisseur*1000:.2f} mm, vis={self.nb_vis}x{self.dim_vis_iso}, "
             f"Rupture: {self.pression_maxi_admissible/1e5:.1f} bar, "
-            f"{self.matiere}, Ra={self.rugosite} µm, {self.etat_surface})"
+            f"{self.matiere}, Ra={self.rugosite} µm, {self.etat_surface})\"
         )
-
-
-def calculer_dimensions_cylindre(puissance_W, pression_moy_Pa, freq_Hz, rendement, rapport_C_D=1.0):
-    if not (0 < rendement <= 1):
-        raise ValueError("Le rendement doit être compris entre 0 exclu et 1 inclus.")
-    if pression_moy_Pa <= 0 or freq_Hz <= 0:
-        raise ValueError("Pression moyenne et fréquence doivent être strictement positives.")
-
-    V = puissance_W / (pression_moy_Pa * 2 * math.pi * freq_Hz * rendement)
-    D_m = ((4 * V) / (math.pi * rapport_C_D)) ** (1/3)
-    C_m = rapport_C_D * D_m
-    return D_m, C_m, V
-
-
-if __name__ == "__main__":
-    puissance_W = 300
-    pression_moy_Pa = 12e5
-    freq_Hz = 25
-    rendement = 0.2
-    rapport_C_D = 1.0
-
-    D_m, C_m, V = calculer_dimensions_cylindre(
-        puissance_W,
-        pression_moy_Pa,
-        freq_Hz,
-        rendement,
-        rapport_C_D
-    )
-
-    cyl = CylindreStirling(
-        diametre_m=D_m,
-        course_m=C_m,
-        epaisseur_m=0.005,
-        matiere="Acier inox 316L",
-        densite_kg_m3=8000,
-        rugosite_um=0.4,
-        etat_surface="Rectifié miroir",
-        Th=850,
-        Tc=300,
-        nb_vis=6,
-        dim_vis_iso="M6",
-        entraxe_vis_pct=0.85,
-        limite_rupture_MPa=700
-    )
-    print(cyl)
-    print("Paramètres CAO et RDM :", cyl.to_dict())
-    chaud_len, chaud_surf = cyl.zone_chaude(frac=0.6)
-    print(f"Zone chaude (60%) : longueur {chaud_len*1e3:.2f} mm, surface {chaud_surf*1e4:.2f} cm²")

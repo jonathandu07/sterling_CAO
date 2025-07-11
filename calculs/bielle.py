@@ -2,23 +2,28 @@
 
 import math
 
+# Tu peux importer ce dict si tu le centralises :
+MATERIAUX = {
+    "Acier": {"rho": 7850},
+    "Aluminium": {"rho": 2700},
+    "Inox": {"rho": 8000},
+    "Laiton": {"rho": 8500},
+}
+
 class BielleStirling:
     """
-    Modélisation d’une bielle de moteur Stirling pour CAO :
-    - Géométrie complète (longueur, diamètres axes)
-    - Masse, matière, état de surface, résistance, volume, etc.
-    - Calculs adaptés pour bielle usinée (rectangulaire ou en I)
+    Modélisation d’une bielle de moteur Stirling pour CAO.
     """
 
     def __init__(
         self,
         longueur_m,
-        largeur_corps_m=0.012,            # Largeur de la bielle (ex : 12 mm)
-        epaisseur_corps_m=0.004,          # Épaisseur du corps (ex : 4 mm)
-        diametre_tete_m=0.018,            # Diamètre tête bielle côté maneton (ex : 18 mm)
-        diametre_pied_m=0.010,            # Diamètre pied côté piston (ex : 10 mm)
-        axe_tete_diam_m=0.008,            # Axe tête (ex : 8 mm)
-        axe_pied_diam_m=0.008,            # Axe pied (ex : 8 mm)
+        largeur_corps_m=0.012,
+        epaisseur_corps_m=0.004,
+        diametre_tete_m=0.018,
+        diametre_pied_m=0.010,
+        axe_tete_diam_m=0.008,
+        axe_pied_diam_m=0.008,
         matiere="Acier 42CrMo4",
         densite_kg_m3=7850,
         etat_surface="Usinage standard",
@@ -40,37 +45,30 @@ class BielleStirling:
 
     @property
     def section(self):
-        "Section droite de la bielle (m²) (rectangulaire par défaut)"
         return self.largeur * self.epaisseur
 
     @property
     def volume_corps(self):
-        "Volume du corps de bielle (m³)"
         return self.section * self.longueur
 
     @property
     def volume_tete(self):
-        "Volume tête (approximé en cylindre plein, m³)"
         return math.pi * (self.diametre_tete / 2) ** 2 * self.epaisseur
 
     @property
     def volume_pied(self):
-        "Volume pied (approximé en cylindre plein, m³)"
         return math.pi * (self.diametre_pied / 2) ** 2 * self.epaisseur
 
     @property
     def volume_total(self):
-        "Volume total de la bielle (m³)"
         return self.volume_corps + self.volume_tete + self.volume_pied
 
     @property
     def masse(self):
-        "Masse totale (kg)"
         return self.volume_total * self.densite
 
     @property
     def surface_totale(self):
-        "Surface externe totale approximative (m²)"
         surf_corps = 2 * (self.largeur + self.epaisseur) * self.longueur
         surf_tete = math.pi * self.diametre_tete * self.epaisseur
         surf_pied = math.pi * self.diametre_pied * self.epaisseur
@@ -78,8 +76,6 @@ class BielleStirling:
 
     @property
     def moment_quadratique(self):
-        "Moment quadratique de la section pour vérification RDM (m⁴)"
-        # I = (b * h^3) / 12 pour rectangle (b = largeur, h = épaisseur)
         return (self.largeur * self.epaisseur ** 3) / 12
 
     def to_dict(self):
@@ -109,20 +105,29 @@ class BielleStirling:
             f"{self.matiere}, Ra={self.rugosite} µm, {self.etat_surface})"
         )
 
-# Exemple d’utilisation :
-if __name__ == "__main__":
-    bielle = BielleStirling(
-        longueur_m=0.048,
-        largeur_corps_m=0.012,
-        epaisseur_corps_m=0.004,
-        diametre_tete_m=0.018,
-        diametre_pied_m=0.010,
-        axe_tete_diam_m=0.008,
-        axe_pied_diam_m=0.008,
-        matiere="Acier 42CrMo4",
-        densite_kg_m3=7850,
-        etat_surface="Usinage + rectif",
-        rugosite_um=0.8
+# 🔁 Fonction utilitaire pour générer automatiquement une bielle
+def bielle_depuis_stirling(data: dict) -> BielleStirling:
+    """
+    Génère une bielle automatiquement à partir des données retournées par `calcul_complet()` du module stirling.
+    """
+    course = data.get("Course_m")
+    matiere = data.get("Materiau", "Acier")
+    densite = MATERIAUX.get(matiere, MATERIAUX["Acier"])["rho"]
+
+    # Longueur approximative : 1.8 × course (standard pour bon rapport r/l)
+    longueur_bielle = 1.8 * course if course else 0.05
+
+    return BielleStirling(
+        longueur_m=longueur_bielle,
+        matiere=matiere,
+        densite_kg_m3=densite
     )
+
+# Exemple
+if __name__ == "__main__":
+    from stirling import calcul_complet
+
+    data = calcul_complet(P=120)
+    bielle = bielle_depuis_stirling(data)
     print(bielle)
-    print("Paramètres CAO :", bielle.to_dict())
+    print(bielle.to_dict())
