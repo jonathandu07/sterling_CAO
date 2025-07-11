@@ -176,6 +176,10 @@ class CreateProjectPage(tk.Frame):
                             + self.tech_label.get("1.0", tk.END), color=JV)
         self.validated = True
 
+        # 👉 Ajoute cette ligne :
+        self.master.show_page(PartsMenuPage, self.tech_sheet)
+
+
     def edit_tech_sheet(self):
         for entry in self.inputs.values():
             entry.config(state="normal")
