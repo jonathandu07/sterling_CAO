@@ -29,7 +29,7 @@ class PieceCylindrePage(tk.Frame):
         self.cylindre = CylindreStirling(
             diametre_m=tech_sheet['Diametre_m'],
             course_m=tech_sheet['Course_m'],
-            epaisseur_m=tech_sheet.get('Epaisseur_m', 0.002),  # Prise en compte si fournie sinon 2mm
+            epaisseur_m=tech_sheet.get('Epaisseur_m', 0.002),
             matiere=tech_sheet.get('Matiere', 'Acier'),
             densite_kg_m3=tech_sheet.get('Densite_kg_m3', 7850),
             rugosite_um=tech_sheet.get('Rugosite_um', 0.8),
@@ -67,7 +67,7 @@ class PieceCylindrePage(tk.Frame):
         # Affichage du plan
         if os.path.exists(self.plan_path):
             image = Image.open(self.plan_path)
-            image = image.resize((600, 300), Image.Resampling.LANCZOS)
+            image = image.resize((800, 400), Image.Resampling.LANCZOS)
             self.photo = ImageTk.PhotoImage(image)
             tk.Label(self, image=self.photo, bg=BG).pack(pady=15)
         else:
@@ -106,14 +106,14 @@ class PieceCylindrePage(tk.Frame):
             line = f"{label} : {value}"
             c.drawString(30, y, line)
             y -= 18
-            if y < 100:  # si trop bas, nouvelle page
+            if y < 100:
                 c.showPage()
                 y = height - 50
                 c.setFont("Helvetica", 12)
 
         # Insérer l'image du plan
         if os.path.exists(self.plan_path):
-            c.drawImage(self.plan_path, 30, y - 300, width=550, height=250, preserveAspectRatio=True)
+            c.drawImage(self.plan_path, 30, y - 300, width=550, height=250, preserveAspectRatio=True, mask='auto')
 
         c.save()
         print(f"PDF généré : {pdf_path}")
