@@ -34,7 +34,6 @@ class CylindreStirling:
         entraxe_vis_pct,
         limite_rupture_MPa
     ):
-        # Contrôles stricts : aucune valeur par défaut, tout doit être explicitement renseigné
         if any(x is None for x in [
             diametre_m, course_m, epaisseur_m, matiere, densite_kg_m3, rugosite_um,
             etat_surface, Tc, Th, nb_vis, dim_vis_iso, entraxe_vis_pct, limite_rupture_MPa
@@ -44,11 +43,9 @@ class CylindreStirling:
         if diametre_m <= 0 or course_m <= 0 or epaisseur_m <= 0:
             raise ValueError("Diamètre, course et épaisseur doivent être strictement positifs.")
 
-        # Récupération diamètre perçage vis en mm
         diam_percage_mm = self.DIAM_PERCAGE_TARAUD_ISO.get(dim_vis_iso, 5.0)
 
-        # Vérification que l’épaisseur est au moins égale au diamètre perçage vis (en m)
-        epaisseur_min = diam_percage_mm / 1000.0  # Converti en mètres
+        epaisseur_min = diam_percage_mm / 1000.0
         if epaisseur_m < epaisseur_min:
             print(f"Attention : épaisseur de paroi {epaisseur_m*1000:.1f} mm trop faible pour vis {dim_vis_iso} "
                   f"(minimum requis {epaisseur_min*1000:.1f} mm). Ajustement automatique.")
@@ -63,10 +60,9 @@ class CylindreStirling:
         self.etat_surface = etat_surface
         self.Tc = Tc
         self.Th = Th
-        # Visserie
         self.nb_vis = nb_vis
         self.dim_vis_iso = dim_vis_iso
-        self.diam_percage_vis = diam_percage_mm / 1000.0  # m
+        self.diam_percage_vis = diam_percage_mm / 1000.0
         self.diam_taraudage_nominal = int(dim_vis_iso[1:]) / 1000.0 if dim_vis_iso.startswith("M") else 0.006
         self.entraxe_vis = (self.diametre / 2) * entraxe_vis_pct
         self.entraxe_vis_pct = entraxe_vis_pct
@@ -122,9 +118,8 @@ class CylindreStirling:
 
     @property
     def perçage_vis(self):
-        """Coordonnées (x, y) des centres de vis sur l'entraxe (mm)"""
         result = []
-        r = self.entraxe_vis * 1000  # mm
+        r = self.entraxe_vis * 1000
         for i in range(self.nb_vis):
             a = 2 * math.pi * i / self.nb_vis
             x = r * math.cos(a)
@@ -134,28 +129,23 @@ class CylindreStirling:
 
     @property
     def section_anneau_autour_taraudage(self):
-        """Section annulaire de paroi restante autour du trou taraudé (mm²)"""
-        r_ext = self.rayon_ext * 1000  # mm
+        r_ext = self.rayon_ext * 1000
         r_trou = self.diam_percage_vis * 1000 / 2
-        section = math.pi * (r_ext ** 2 - r_trou ** 2) - math.pi * (self.rayon ** 2)
-        return max(section, 0)  # mm²
+        section = math.pi * (r_ext ** 2 - r_trou ** 2) - math.pi * (self.rayon * 1000) ** 2
+        return max(section, 0)
 
     @property
     def effort_max_admissible_par_taraudage(self):
-        """Effort admissible par vis (cisaillement ou arrachement paroi) en N"""
-        S = self.section_anneau_autour_taraudage / 1e6  # mm² -> m²
-        # Limite en traction (N)
-        return S * self.limite_rupture_MPa * 1e6  # (m²)*(Pa)
+        S = self.section_anneau_autour_taraudage / 1e6
+        return S * self.limite_rupture_MPa * 1e6
 
     @property
     def effort_total_visserie(self):
-        """Effort total admissible par la visserie (N)"""
         return self.nb_vis * self.effort_max_admissible_par_taraudage
 
     @property
     def pression_maxi_admissible(self):
-        """Pression admissible (Pa) sur la face avant avant rupture des taraudages (≈ sécurité)"""
-        S_fond = self.surface_fond  # m²
+        S_fond = self.surface_fond
         return self.effort_total_visserie / S_fond if S_fond else 0
 
     def zone_chaude(self, frac):
@@ -207,13 +197,37 @@ class CylindreStirling:
         )
 
 
-# Exemple d’utilisation (tous les paramètres doivent venir d’un calcul préalable, aucune valeur par défaut)
+def calculer_dimensions_cylindre(puissance_W, pression_moy_Pa, freq_Hz, rendement, rapport_C_D=1.0):
+    if not (0 < rendement <= 1):
+        raise ValueError("Le rendement doit être compris entre 0 exclu et 1 inclus.")
+    if pression_moy_Pa <= 0 or freq_Hz <= 0:
+        raise ValueError("Pression moyenne et fréquence doivent être strictement positives.")
+
+    V = puissance_W / (pression_moy_Pa * 2 * math.pi * freq_Hz * rendement)
+    D_m = ((4 * V) / (math.pi * rapport_C_D)) ** (1/3)
+    C_m = rapport_C_D * D_m
+    return D_m, C_m, V
+
+
 if __name__ == "__main__":
-    # Tous les paramètres doivent être passés explicitement !
+    puissance_W = 300
+    pression_moy_Pa = 12e5
+    freq_Hz = 25
+    rendement = 0.2
+    rapport_C_D = 1.0
+
+    D_m, C_m, V = calculer_dimensions_cylindre(
+        puissance_W,
+        pression_moy_Pa,
+        freq_Hz,
+        rendement,
+        rapport_C_D
+    )
+
     cyl = CylindreStirling(
-        diametre_m=0.022,
-        course_m=0.018,
-        epaisseur_m=0.005,  # corrigé pour être compatible M6
+        diametre_m=D_m,
+        course_m=C_m,
+        epaisseur_m=0.005,
         matiere="Acier inox 316L",
         densite_kg_m3=8000,
         rugosite_um=0.4,
