@@ -1,10 +1,10 @@
-# calculs/displacer.py
+# calculs/deplacer.py
 
 import math
 
-class DisplacerStirling:
+class deplacerStirling:
     """
-    Modélisation d’un displacer ("galette" séparatrice) pour moteur Stirling :
+    Modélisation d’un deplacer ("galette" séparatrice) pour moteur Stirling :
     - Géométrie, matière, densité, masse, surfaces, état de surface, etc.
     - Calcul automatique des joints toriques d'étanchéité d'axe (ISO 3601 + tolérances du guide du dessinateur industriel).
     """
@@ -38,8 +38,8 @@ class DisplacerStirling:
         return self.diametre / 2
 
     @property
-    def volume_displacer(self):
-        """Volume apparent du displacer, sans axe (m³)"""
+    def volume_deplacer(self):
+        """Volume apparent du deplacer, sans axe (m³)"""
         return math.pi * (self.rayon ** 2) * self.hauteur
 
     @property
@@ -51,7 +51,7 @@ class DisplacerStirling:
     @property
     def volume_total(self):
         """Volume total galette + axe (m³)"""
-        return self.volume_displacer + self.volume_axe
+        return self.volume_deplacer + self.volume_axe
 
     @property
     def masse(self):
@@ -134,13 +134,13 @@ class DisplacerStirling:
 
     def __repr__(self):
         return (
-            f"DisplacerStirling(D={self.diametre*1000:.2f} mm, H={self.hauteur*1000:.2f} mm, "
+            f"deplacerStirling(D={self.diametre*1000:.2f} mm, H={self.hauteur*1000:.2f} mm, "
             f"axe Ø={self.axe_diam*1000:.2f} mm, {self.matiere}, {self.etat_surface}, Ra={self.rugosite} µm)"
         )
 
 # Exemple d’utilisation
 if __name__ == "__main__":
-    galette = DisplacerStirling(
+    galette = deplacerStirling(
         diametre_m=0.021,
         hauteur_m=0.017,
         epaisseur_fond_m=0.001,

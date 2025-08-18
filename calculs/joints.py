@@ -24,7 +24,7 @@ def trouve_joint_torique(d_arbre_mm=None, d_alésage_mm=None, tol="dynamique", m
     Sélectionne le joint torique standard le plus adapté, retourne ses cotes normalisées et tolérances.
     - d_arbre_mm : diamètre arbre (ou diamètre intérieur pour piston)
     - d_alésage_mm : diamètre alésage (alésage du logement joint sur le cylindre)
-    - tol : type d’application ("dynamique"=piston/displacer, "statique"=couvercle)
+    - tol : type d’application ("dynamique"=piston/deplacer, "statique"=couvercle)
     - mat : matériau du joint ("NBR", "FKM", "EPDM", "PTFE"…)
     - clearance : jeu de fonctionnement visé (mm) (typiquement 0.05 à 0.15 mm)
     """

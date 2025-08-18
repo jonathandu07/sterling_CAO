@@ -1,12 +1,12 @@
-# tests\test_displacer.py
+# tests\test_deplacer.py
 
 import traceback
-from calculs.displacer import DisplacerStirling
+from calculs.deplacer import deplacerStirling
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-def test_displacer_stirling():
-    print("==== TEST : DisplacerStirling ====")
+def test_deplacer_stirling():
+    print("==== TEST : deplacerStirling ====")
     tests = [
         {
             "desc": "Cas nominal : galette aluminium, Ø21mm, H=17mm, axe Ø6mm",
@@ -88,7 +88,7 @@ def test_displacer_stirling():
     for idx, test in enumerate(tests):
         print(f"\n--- Test #{idx + 1}: {test['desc']} ---")
         try:
-            d = DisplacerStirling(**test["params"])
+            d = deplacerStirling(**test["params"])
             print(d)
             dd = d.to_dict()
             for k, v in dd.items():
@@ -120,7 +120,7 @@ def test_displacer_stirling():
             if test["expect_fail"]:
                 print("ERREUR : exception attendue NON LEVÉE !", test["params"])
 
-    print("\n==== FIN TESTS DisplacerStirling ====\n")
+    print("\n==== FIN TESTS deplacerStirling ====\n")
 
 if __name__ == "__main__":
-    test_displacer_stirling()
+    test_deplacer_stirling()

@@ -14,7 +14,7 @@ def test_trouve_joint_torique():
             "expect_fail": False
         },
         {
-            "desc": "Displacer axe Ø6mm (arbre seul), dynamique",
+            "desc": "deplacer axe Ø6mm (arbre seul), dynamique",
             "params": dict(d_arbre_mm=6.0, tol="dynamique"),
             "expect_fail": False
         },
